@@ -7,6 +7,7 @@ export interface RecipeItem {
   estimated_quantity: number
   unit: string
   yield_quantity: number
+  yield_unit: string
 }
 
 export interface RecipeItemCreate {
@@ -14,6 +15,7 @@ export interface RecipeItemCreate {
   estimated_quantity: number
   unit: string
   yield_quantity?: number
+  yield_unit?: string
 }
 
 export interface Product {

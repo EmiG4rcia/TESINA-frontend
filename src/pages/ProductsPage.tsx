@@ -5,11 +5,12 @@ import { PrimaryButton, IconButton } from '../components/buttons'
 import { ProductModal } from '../components/modals/ProductModal'
 import { formatQuantity } from '../utils/format'
 import type { Product } from '../types'
+import { ProductDetailModal } from '../components/modals/ProductDetailModal'  
 
 export function ProductsPage() {
   const [showModal, setShowModal] = useState(false)
   const [editing, setEditing] = useState<Product | undefined>()
-
+  const [viewing, setViewing] = useState <Product | undefined>()
   const { data: products, isLoading } = useProducts(true)
   const deleteProduct = useDeleteProduct()
 
@@ -69,7 +70,8 @@ export function ProductsPage() {
                 products?.map((item) => (
                   <tr
                     key={item.id}
-                    className={`hover:bg-gray-50 transition-colors ${item.is_low_stock ? 'bg-red-50' : ''}`}
+                    className={`hover:bg-gray-50 transition-colors cursor-pointer ${item.is_low_stock ? 'bg-red-50' : ''}`}
+                    onClick={() => setViewing(item)}
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -108,7 +110,7 @@ export function ProductsPage() {
                         {item.is_active ? 'Activo' : 'Inactivo'}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <div className="flex gap-1">
                         <IconButton
                           icon={<span className="text-sm">✏️</span>}
@@ -130,6 +132,18 @@ export function ProductsPage() {
           </table>
         </div>
       </main>
+
+      {viewing && (
+        <ProductDetailModal
+          item={viewing}
+          onClose={() => setViewing(undefined)}
+          onEdit={() => {
+            setEditing(viewing)
+            setViewing(undefined)
+            setShowModal(true)
+          }}
+        />
+      )}
 
       {showModal && (
         <ProductModal item={editing} onClose={handleClose} />

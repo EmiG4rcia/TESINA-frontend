@@ -25,6 +25,7 @@ export function ProductModal({ item, onClose }: Props) {
   const [recipeQty, setRecipeQty] = useState('')
   const [recipeUnit, setRecipeUnit] = useState('kg')
   const [recipeYield, setRecipeYield] = useState('1')
+  const [recipeYieldUnit, setRecipeYieldUnit] = useState('unidad')
 
   const create = useCreateProduct()
   const update = useUpdateProduct()
@@ -60,12 +61,15 @@ export function ProductModal({ item, onClose }: Props) {
   }
 
   const handleAddRecipe = () => {
+    console.log('item?.id:', item?.id, 'selectedRmId:', selectedRmId, 'recipeQty:', recipeQty)
+    console.log('recipeYield:', recipeYield, 'recipeYieldUnit:', recipeYieldUnit)
     if (!item?.id || !selectedRmId || !recipeQty) return
     const data: RecipeItemCreate = {
       raw_material_id: parseInt(selectedRmId),
       estimated_quantity: parseFloat(recipeQty),
       unit: recipeUnit,
       yield_quantity: parseFloat(recipeYield),
+      yield_unit: recipeYieldUnit,
     }
     addRecipeItem.mutate(
       { productId: item.id, data },
@@ -74,6 +78,7 @@ export function ProductModal({ item, onClose }: Props) {
           setSelectedRmId('')
           setRecipeQty('')
           setRecipeYield('1')
+          setRecipeYieldUnit('unidad')
           refetch()
         }
       }
@@ -161,7 +166,7 @@ export function ProductModal({ item, onClose }: Props) {
                       <span className="text-gray-700">{r.raw_material_name}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-gray-500 text-xs">
-                          {r.estimated_quantity} {r.unit} → rinde {r.yield_quantity} {item?.unit}
+                           {parseFloat(r.estimated_quantity.toString())} {r.unit} → rinde {parseFloat(r.yield_quantity.toString())} {r.yield_unit}
                         </span>
                         <IconButton
                           icon={<span className="text-xs">✕</span>}
@@ -216,10 +221,17 @@ export function ProductModal({ item, onClose }: Props) {
                   className="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   min="0.001" step="0.001"
                 />
+                <select
+                  value={recipeYieldUnit}
+                  onChange={(e) => setRecipeYieldUnit(e.target.value)}
+                  className="w-20 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {units.map((u) => <option key={u} value={u}>{u}</option>)}
+                </select>
                 <PrimaryButton label="+" onClick={handleAddRecipe} size="sm" />
               </div>
               <p className="text-xs text-gray-400 mt-1">
-                {recipeQty || 'X'} {recipeUnit} de materia prima rinde {recipeYield} {item?.unit} de {item?.name}
+                {recipeQty || 'X'} {recipeUnit} → rinde {recipeYield} {recipeYieldUnit} de {item?.name}
               </p>
             </div>
           )}
